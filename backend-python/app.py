@@ -16,7 +16,7 @@ def home():
     <p>Available endpoints:</p>
     <ul>
         <li>/gcp/bigtable/all</li>
-        <li>/gcp/sql/all</li>
+        <li>/gcp/sql/all?table=analysis_logs</li>
         <li>/gcp/sql/insert</li>
         <li>/ai/process_text</li>
         <li>/ai/analyze_numbers</li>
@@ -24,7 +24,7 @@ def home():
     """
 
 # -------------------------
-# Bigtable endpoint
+# GCP Bigtable endpoint
 # -------------------------
 @app.route("/gcp/bigtable/all", methods=["GET"])
 def fetch_bigtable_data():
@@ -35,12 +35,13 @@ def fetch_bigtable_data():
         return jsonify({"error": str(e)}), 500
 
 # -------------------------
-# SQL endpoints
+# SQL endpoints (dynamic table selection)
 # -------------------------
 @app.route("/gcp/sql/all", methods=["GET"])
 def fetch_sql_data():
     try:
-        data = get_sql_data()
+        table = request.args.get("table", "analysis_logs")  # default to 'analysis_logs'
+        data = get_sql_data(table)
         return jsonify(data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -48,9 +49,11 @@ def fetch_sql_data():
 @app.route("/gcp/sql/insert", methods=["POST"])
 def insert_sql():
     try:
-        data = request.json
-        insert_sql_data(data)
-        return jsonify({"message": "Inserted successfully"}), 201
+        payload = request.json or {}
+        table = payload.get("table", "analysis_logs")  # default to 'analysis_logs'
+        payload.pop("table", None)  # remove table key before inserting
+        insert_sql_data(table, payload)
+        return jsonify({"message": f"Inserted successfully into {table}"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

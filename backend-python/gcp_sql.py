@@ -1,13 +1,18 @@
 # gcp_sql.py
+
 import mysql.connector
 from config import MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB
 
-# -----------------------------
-# Replace 'YOUR_TABLE' with your actual table name
-# -----------------------------
-TABLE_NAME = "YOUR_TABLE"
+# Allowed tables
+ALLOWED_TABLES = {
+    "analysis_logs",
+    "cloudsql_table"
+}
 
-def get_sql_data():
+def get_sql_data(table_name):
+    if table_name not in ALLOWED_TABLES:
+        raise ValueError(f"Invalid table name: {table_name}")
+
     conn = mysql.connector.connect(
         host=MYSQL_HOST,
         port=MYSQL_PORT,
@@ -16,13 +21,16 @@ def get_sql_data():
         database=MYSQL_DB
     )
     cursor = conn.cursor(dictionary=True)
-    cursor.execute(f"SELECT * FROM {TABLE_NAME}")
+    cursor.execute(f"SELECT * FROM {table_name}")
     result = cursor.fetchall()
     cursor.close()
     conn.close()
     return result
 
-def insert_sql_data(data_dict):
+def insert_sql_data(table_name, data_dict):
+    if table_name not in ALLOWED_TABLES:
+        raise ValueError(f"Invalid table name: {table_name}")
+
     conn = mysql.connector.connect(
         host=MYSQL_HOST,
         port=MYSQL_PORT,
@@ -33,7 +41,7 @@ def insert_sql_data(data_dict):
     cursor = conn.cursor()
     placeholders = ", ".join(["%s"] * len(data_dict))
     columns = ", ".join(data_dict.keys())
-    sql = f"INSERT INTO {TABLE_NAME} ({columns}) VALUES ({placeholders})"
+    sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
     cursor.execute(sql, tuple(data_dict.values()))
     conn.commit()
     cursor.close()
