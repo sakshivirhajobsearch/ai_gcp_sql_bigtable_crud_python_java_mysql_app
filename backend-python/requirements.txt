@@ -1,0 +1,6 @@
+Flask
+mysql-connector-python
+google-cloud-sqlcommenter
+google-cloud-bigtable
+google-cloud-core
+mysql-connector-python
