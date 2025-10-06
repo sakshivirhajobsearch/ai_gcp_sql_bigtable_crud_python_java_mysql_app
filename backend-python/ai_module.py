@@ -1,23 +1,18 @@
-import re
+# ai_module.py
 
-def analyze_data(data):
-    result = {
-        "records": len(data),
-        "anomalies": []
+def process_text(text):
+    return {
+        "original": text,
+        "length": len(text),
+        "processed": text.upper()
     }
 
-    for i, row in enumerate(data):
-        if isinstance(row, dict):
-            values = row.values()
-        else:
-            values = row
-
-        if not values or all(str(x).strip() == "" for x in values):
-            result["anomalies"].append({"index": i, "issue": "Empty row"})
-        elif any("error" in str(x).lower() for x in values):
-            result["anomalies"].append({"index": i, "issue": "Contains 'error'"})
-        elif any(re.match(r'^\d{10,}$', str(x)) for x in values):
-            result["anomalies"].append({"index": i, "issue": "Possible sensitive data"})
-
-    result["status"] = "Anomaly Detected" if result["anomalies"] else "Normal"
-    return result
+def analyze_numbers(numbers):
+    if not numbers:
+        numbers = []
+    return {
+        "count": len(numbers),
+        "sum": sum(numbers) if numbers else 0,
+        "max": max(numbers) if numbers else None,
+        "min": min(numbers) if numbers else None
+    }
