@@ -1,7 +1,7 @@
 # config.py
 
 # GCP Project and Bigtable
-PROJECT_ID = "adroit-standard-431618-m4"
+PROJECT_ID = ""
 BIGTABLE_INSTANCE_ID = "your-bigtable-instance"
 BIGTABLE_TABLE_ID = "your-table-name"
 
